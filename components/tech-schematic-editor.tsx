@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CustomNode } from "@/components/custom-node"
 import { Toolbar } from "@/components/toolbar"
 import { PropertiesPanel } from "@/components/properties-panel"
+import { BarcodeScanner } from "@/components/barcode-scanner"
 
 // Initial nodes for the diagram
 const initialNodes: Node[] = [
@@ -81,6 +82,7 @@ export default function TechSchematicEditor() {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [selectedEdge, setSelectedEdge] = useState<Edge | null>(null)
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
+  const [showScanner, setShowScanner] = useState(false)
 
   // Handle connections between nodes
   const onConnect = useCallback(
@@ -141,6 +143,30 @@ export default function TechSchematicEditor() {
     [nodes, setNodes],
   )
 
+  // Handle barcode scan results
+  const handleBarcodeScan = useCallback(
+    (scannedData: any) => {
+      const newNode: Node = {
+        id: `${nodes.length + 1}`,
+        type: "custom",
+        position: { x: 200, y: 200 },
+        data: {
+          label: scannedData.name || "Scanned Component",
+          description: scannedData.description || "Component loaded from barcode scan",
+          specs: scannedData.specs || "Specifications loaded automatically",
+          connections: [],
+          color: scannedData.color || "#8b5cf6",
+          barcode: scannedData.barcode,
+          manufacturer: scannedData.manufacturer,
+          model: scannedData.model,
+        },
+      }
+      setNodes((nds) => [...nds, newNode])
+      setShowScanner(false)
+    },
+    [nodes, setNodes],
+  )
+
   return (
     <div className="flex h-[calc(100vh-57px)]">
       {/* Left sidebar with tools */}
@@ -184,6 +210,12 @@ export default function TechSchematicEditor() {
                   Firewall
                 </Button>
               </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Scanner</h3>
+              <Button variant="outline" className="w-full justify-start text-sm" onClick={() => setShowScanner(true)}>
+                📱 Scan Barcode
+              </Button>
             </div>
           </TabsContent>
           <TabsContent value="tools" className="space-y-4 pt-4">
@@ -236,6 +268,7 @@ export default function TechSchematicEditor() {
           <div className="text-sm text-muted-foreground">Select a node or edge to view and edit its properties.</div>
         )}
       </div>
+      {showScanner && <BarcodeScanner onScan={handleBarcodeScan} onClose={() => setShowScanner(false)} />}
     </div>
   )
 }

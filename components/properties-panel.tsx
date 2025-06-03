@@ -85,6 +85,24 @@ export function PropertiesPanel({ node, updateNodeData }: PropertiesPanelProps) 
           />
         </div>
       </div>
+      {node.data.barcode && (
+        <div>
+          <Label>Barcode</Label>
+          <Input value={node.data.barcode} disabled className="text-sm" />
+        </div>
+      )}
+      {node.data.manufacturer && (
+        <div>
+          <Label>Manufacturer</Label>
+          <Input value={node.data.manufacturer} disabled className="text-sm" />
+        </div>
+      )}
+      {node.data.model && (
+        <div>
+          <Label>Model</Label>
+          <Input value={node.data.model} disabled className="text-sm" />
+        </div>
+      )}
       <div>
         <Label>Position</Label>
         <div className="grid grid-cols-2 gap-2">
